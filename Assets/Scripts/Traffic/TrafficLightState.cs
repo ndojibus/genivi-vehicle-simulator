@@ -17,9 +17,9 @@ public class TrafficLightState : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        red = transform.FindChild("red").gameObject;
-        green = transform.FindChild("green").gameObject;
-        yellow = transform.FindChild("yellow").gameObject;
+        red = transform.Find("red").gameObject;
+        green = transform.Find("green").gameObject;
+        yellow = transform.Find("yellow").gameObject;
         stop = GetComponentInChildren<TrafficLightStop>();
 
 

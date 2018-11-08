@@ -157,6 +157,22 @@ public class TrafEntry
         return false;
     }
 
+    /*public override string ToString()
+    {
+        string risposta = "id = " + identifier + "\nsubid = " + subIdentifier;
+        risposta += "\nnumero waypoints = " + waypoints.Count;
+        return risposta;
+        /*public int identifier;
+    public int subIdentifier;
+
+
+    public TrafIntersection intersection;
+    public TrafIntersectionPath path;
+    public TrafRoad road;
+    public TrafficLightContainer light;
+    public List<Vector3> waypoints;
+    public List<SplineNode> spline;
+    }*/
 }
 
 [System.Serializable]
@@ -230,7 +246,7 @@ public class TrafSystem : MonoBehaviour {
         }
     }
 
-    [HideInInspector]
+    //[HideInInspector]
     public TrafRoadGraph roadGraph;
 
     public void Awake()

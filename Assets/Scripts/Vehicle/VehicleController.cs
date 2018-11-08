@@ -6,9 +6,12 @@
  */
 
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+
 
 [System.Serializable]
 public class AxleInfo
@@ -33,7 +36,15 @@ public class AxleInfo
 
 public enum RoadSurface { Tarmac, Offroad, Airborne}
 
+
+/// <summary>
+/// Manage manual drive with physics
+/// </summary>
 public class VehicleController : MonoBehaviour {
+
+    //ANTONELLO
+    public UnityEngine.UI.Slider sliderAccelerazione;
+    public UnityEngine.UI.Slider sliderFrenata;
 
     //all car wheel info
     public List<AxleInfo> axles;
@@ -101,6 +112,7 @@ public class VehicleController : MonoBehaviour {
 
     //steering input
     public float steerInput = 0f;
+
 
     public float RPM
     {
@@ -219,6 +231,18 @@ public class VehicleController : MonoBehaviour {
     public float rtractionR = 0f;
     public string roadType;
 
+    //DARIO
+    public GameObject volant;
+    public AnimationCurve angle_x_Velocity = new AnimationCurve(new Keyframe(0, 1), new Keyframe(100, 0.6f), new Keyframe(500, 0.3f));
+    float angle1Ref;
+    float angle2Volant;
+    float volantStartRotation;
+    float angleRefVolant;
+    float maxAngleVolant;
+
+
+
+
     void OnEnable()
     {
         //cache rigidbody
@@ -293,10 +317,27 @@ public class VehicleController : MonoBehaviour {
         }
     }
 
-  
 
     public void FixedUpdate()
     {
+        //ANTONELLO
+        if (sliderFrenata != null && sliderAccelerazione != null)
+        {
+            if (accellInput < 0)
+            {
+                sliderFrenata.value = this.accellInput;
+                sliderAccelerazione.value = 0;
+            }
+            else
+            {
+                sliderAccelerazione.value = this.accellInput;
+                sliderFrenata.value = 0;
+            }
+        }
+
+        
+        
+
 
         //air drag (quadratic)
         rb.AddForce(-airDragCoeff * rb.velocity * rb.velocity.magnitude);
@@ -344,8 +385,9 @@ public class VehicleController : MonoBehaviour {
         //shift if need be
         AutoGearBox();
 
-        //record current speed in MPH
-        currentSpeed = rb.velocity.magnitude * 2.23693629f;
+        //record current speed in MPH  DARIO
+        currentSpeed = rb.velocity.magnitude * 2.23693629f; //to obtain velocity from metersPerSecond to MilesPerHour
+        //currentSpeed = rb.velocity.magnitude * 3.6f; //to obtain velocity from metersPerSecond to KmPerHour
 
         //find current road surface type
         WheelHit hit;
@@ -386,6 +428,10 @@ public class VehicleController : MonoBehaviour {
         {
             rtraction = 0f;
         }
+        
+        //DARIO
+        Volant();
+   
 
     }
 
@@ -518,11 +564,13 @@ public class VehicleController : MonoBehaviour {
         visualWheel.transform.rotation = rotation;
     }
 
+
     private void OnGUI()
     {
         GUI.Label(new Rect(10, 10, 500, 200), "GEAR " + (Mathf.RoundToInt(currentGear)));
         GUI.Label(new Rect(10, 30, 500, 200), "RPM " + Mathf.RoundToInt(currentRPM));
-        GUI.Label(new Rect(10, 50, 500, 200), "MPH " + Mathf.RoundToInt(currentSpeed));
+        //GUI.Label(new Rect(10, 50, 500, 200), "MPH " + Mathf.RoundToInt(currentSpeed)); //DARIO
+        GUI.Label(new Rect(10, 50, 500, 200), "KPH " + Math.Round(rb.velocity.magnitude * 3.6f));
         GUI.Label(new Rect(10, 70, 500, 200), "THROTTLE " +  accellInput.ToString("F2"));
         GUI.Label(new Rect(10, 90, 500, 200), "WHEEL POSITION " + steerInput.ToString("F3"));
         GUI.Label(new Rect(10, 110, 500, 200), "TRACTION " + traction.ToString("F3"));
@@ -531,4 +579,142 @@ public class VehicleController : MonoBehaviour {
         GUI.Label(new Rect(10, 180, 500, 200), "TRACTIONR " + rtractionR.ToString("F3"));
 
     }
+
+    void Start()
+    {
+        if (volant)
+        {
+            volantStartRotation = volant.transform.localEulerAngles.z;
+        }
+
+
+    }
+
+    //ANTONELLO
+    private float angle2VolantPrecedente = 0f;
+
+
+    /// <summary>
+    /// Logic for virtual steering wheel movements
+    /// </summary>
+    void Volant()
+    {
+        angle1Ref = Mathf.MoveTowards(angle1Ref, steerInput, Time.deltaTime);
+        angle2Volant = Mathf.MoveTowards(angle2Volant, steerInput, Time.deltaTime);
+        //
+        maxAngleVolant = 35.0f * angle_x_Velocity.Evaluate(currentSpeed);
+        angleRefVolant = Mathf.Clamp(angle1Ref * maxAngleVolant, -maxAngleVolant, maxAngleVolant);
+
+        //if (angle1Ref > 0.2f)
+        //{
+        //    if (axles[0].steering /*_wheels.rightFrontWheel.wheelTurn*/)
+        //    {
+        //        //_wheels.rightFrontWheel.wheelCollider.steerAngle = angleRefVolant * 1.2f;
+        //        axles[0].right.steerAngle = angleRefVolant * 1.2f;
+        //    }
+        //    if (axles[0].steering /*_wheels.leftFrontWheel.wheelTurn*/)
+        //    {
+        //        //_wheels.leftFrontWheel.wheelCollider.steerAngle = angleRefVolant;
+        //        axles[0].left.steerAngle = angleRefVolant;
+        //    }
+        //    if (axles[1].steering/*_wheels.rightRearWheel.wheelTurn*/)
+        //    {
+        //        //_wheels.rightRearWheel.wheelCollider.steerAngle = angleRefVolant * 1.2f;
+        //        axles[1].right.steerAngle = angleRefVolant * 1.2f;
+        //    }
+        //    if (axles[1].steering /*_wheels.leftRearWheel.wheelTurn*/)
+        //    {
+        //        //_wheels.leftRearWheel.wheelCollider.steerAngle = angleRefVolant;
+        //        axles[1].left.steerAngle = angleRefVolant;
+        //    }
+        //}
+        //else if (angle1Ref < -0.2f)
+        //{
+        //    if (axles[0].steering/*_wheels.rightFrontWheel.wheelTurn*/)
+        //    {
+        //        axles[0].right.steerAngle = angleRefVolant;
+        //        //_wheels.rightFrontWheel.wheelCollider.steerAngle = angleRefVolant;
+        //    }
+        //    if (axles[0].steering/*_wheels.leftFrontWheel.wheelTurn*/)
+        //    {
+        //        axles[0].left.steerAngle = angleRefVolant * 1.2f;
+        //        //_wheels.leftFrontWheel.wheelCollider.steerAngle = angleRefVolant * 1.2f;
+        //    }
+        //    if (axles[1].steering/*_wheels.rightRearWheel.wheelTurn*/)
+        //    {
+        //        axles[1].right.steerAngle = angleRefVolant;
+        //        //_wheels.rightRearWheel.wheelCollider.steerAngle = angleRefVolant;
+        //    }
+        //    if (axles[1].steering/*_wheels.leftRearWheel.wheelTurn*/)
+        //    {
+        //        axles[1].left.steerAngle = angleRefVolant * 1.2f;
+        //        //_wheels.leftRearWheel.wheelCollider.steerAngle = angleRefVolant * 1.2f;
+        //    }
+        //}
+        //else
+        //{
+        //    if (axles[0].steering/*_wheels.rightFrontWheel.wheelTurn*/)
+        //    {
+        //        axles[0].right.steerAngle = angleRefVolant;
+        //        //_wheels.rightFrontWheel.wheelCollider.steerAngle = angleRefVolant;
+        //    }
+        //    if (axles[0].steering/*_wheels.leftFrontWheel.wheelTurn*/)
+        //    {
+        //        axles[0].left.steerAngle = angleRefVolant;
+        //        //_wheels.leftFrontWheel.wheelCollider.steerAngle = angleRefVolant;
+        //    }
+        //    if (axles[1].steering/*_wheels.rightRearWheel.wheelTurn*/)
+        //    {
+        //        axles[1].right.steerAngle = angleRefVolant;
+        //        //_wheels.rightRearWheel.wheelCollider.steerAngle = angleRefVolant;
+        //    }
+        //    if (axles[1].steering/*_wheels.leftRearWheel.wheelTurn*/)
+        //    {
+        //        axles[1].left.steerAngle = angleRefVolant;
+        //        //_wheels.leftRearWheel.wheelCollider.steerAngle = angleRefVolant;
+        //    }
+        //}
+
+        if (volant)
+        {
+            CarExternalInputAutoPathAdvanced carExt = gameObject.GetComponent<CarExternalInputAutoPathAdvanced>();
+            if (carExt != null)
+            {
+                /*if (carExt.sbacchettamento)
+                {
+                    volant.transform.localEulerAngles = new Vector3(volant.transform.localEulerAngles.x, volant.transform.localEulerAngles.y, volantStartRotation + (angle2VolantPrecedente * 443.0f));
+                    return;
+                }*/
+                /*if((angle2VolantPrecedente < 0 && angle2Volant > 0) || (angle2VolantPrecedente > 0 && angle2Volant < 0))
+                {
+                    volant.transform.localEulerAngles = new Vector3(volant.transform.localEulerAngles.x, volant.transform.localEulerAngles.y, volantStartRotation + (angle2VolantPrecedente * 443.0f));
+                    angle2VolantPrecedente = angle2Volant;
+                    return;
+                }*/
+                if (carExt.sbacchettamento && !carExt.sbacchettamentoEvitabile)
+                {
+                    float sterzata;
+                    if (carExt.sbacchettamentoForte)
+                    {
+                        sterzata = Mathf.Lerp(angle2VolantPrecedente, angle2Volant, 2f * Time.fixedDeltaTime);
+                    }
+                    else
+                    {
+                        sterzata = Mathf.Lerp(angle2VolantPrecedente, angle2Volant, 5f * Time.fixedDeltaTime);
+                    }
+                    volant.transform.localEulerAngles = new Vector3(volant.transform.localEulerAngles.x, volant.transform.localEulerAngles.y, volantStartRotation + (sterzata * 443.0f));
+                    angle2VolantPrecedente = sterzata;
+                    return;
+                }
+            }
+            volant.transform.localEulerAngles = new Vector3(volant.transform.localEulerAngles.x, volant.transform.localEulerAngles.y, volantStartRotation + (angle2Volant * 443.0f));
+            angle2VolantPrecedente = angle2Volant;
+        }
+    }
+
+
+
+
+
 }
+

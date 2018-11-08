@@ -23,10 +23,10 @@ public class NetworkSettings
         //hostIp = "127.0.0.1";
         //clientIp = "192.168.178.29";
         //altClientIP = "127.0.0.1";
-        hostIp = "192.168.16.129";
-        clientIp = "192.168.16.128";
-        eventClientIP = "127.0.0.1";
-        altClientIP = "192.168.16.85";
+        hostIp = "192.168.43.101";
+        clientIp = "192.168.43.34";
+        eventClientIP = "192.168.43.34";
+        altClientIP = "192.168.43.34";
 
     }
 
@@ -84,6 +84,7 @@ public class NetworkController : PersistentUnitySingleton<NetworkController> {
         if(ShowBuild.GetBuildType() == "CONSOLE")
             isMaster = false;
 
+        isMaster = false;
         if (isMaster)
         {
             Network.InitializeServer(1, 25552, false);
@@ -91,7 +92,7 @@ public class NetworkController : PersistentUnitySingleton<NetworkController> {
         else
         {
             Debug.Log("connecting: " + Network.Connect(NetworkController.settings.hostIp, 25552));
-
+            Debug.Log("Sono fuori dalla connect");
         }
 
 

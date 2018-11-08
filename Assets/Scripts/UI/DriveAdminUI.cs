@@ -473,7 +473,7 @@ public class InfractionsItem : AdminItem
         foreach (var i in infractions)
         {
 
-            if (Event.current.type == EventType.mouseDown && i.selectionRect.Contains(Event.current.mousePosition))
+            if (Event.current.type == EventType.MouseDown && i.selectionRect.Contains(Event.current.mousePosition))
             {
                 SelectScreenshot(i.infraction.id);
             }
@@ -885,7 +885,7 @@ public partial class DriveAdminUI : MonoBehaviour {
             if (i != 4 || AppController.Instance.appSettings.showConfigurator)
             {
                 GUI.Label(categories[i].location, categories[i].text, i == currentCategory ? categoryOnStyle : categoryOffStyle);
-                if (Event.current.type == EventType.mouseDown && categories[i].location.Contains(Event.current.mousePosition))
+                if (Event.current.type == EventType.MouseDown && categories[i].location.Contains(Event.current.mousePosition))
                 {
                     tempCategory = i;
                 }

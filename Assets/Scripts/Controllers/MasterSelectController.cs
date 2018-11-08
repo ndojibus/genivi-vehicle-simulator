@@ -11,6 +11,8 @@ using System.Collections.Generic;
 
 public class MasterSelectController : MonoBehaviour {
 
+    public static event System.Action OnCreateScene; //DARIO
+
     public List<BaseSelectController> controllers;
 
     public SelectScreenAdmin adminScreen;
@@ -212,6 +214,9 @@ public class MasterSelectController : MonoBehaviour {
             console.enabled = true;
             console.Init();
         }
+
+        if (OnCreateScene != null)  //DARIO
+            OnCreateScene();
 
 
     }

@@ -20,11 +20,15 @@ public class BrandSelectController : BaseSelectController
 
     public List<BrandChoice> choices;
     public float dimAlpha = 0.3f;
-    public new int currentChoice = 0;
+
+    //PER FAR FUNZIONARE LA BUILD
+    //public new int currentChoice = 0;
 
     public void Awake()
     {
-        foreach(var c in choices)
+        //PER FAR FUNZIONARE LA BUILD ANTONELLO
+        currentChoice = 0;
+        foreach (var c in choices)
         {
             c.displayObject.GetComponent<GuiTextAlphaFade>().targetAlpha = dimAlpha;
         }

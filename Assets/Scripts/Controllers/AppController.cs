@@ -175,7 +175,6 @@ public class AppController : PersistentUnitySingleton<AppController>
             default:
                 return Application.LoadLevelAdditiveAsync(appSettings.coastalDrivingScene);
         }
-
     }
 
     public AsyncOperation LoadDrivingSceneAsync(Environment environment)

@@ -333,8 +333,13 @@ public class EnvironmentSelectController : BaseSelectController {
         AudioController.Instance.PlayClip(onConfirm);
         AppController.Instance.currentSessionSettings.selectedEnvironment = choices[currentChoice].environment;
 
-        RemoteAdminController.Instance.SendMessage(RemoteAdminController.SendMessageType.SELECT_SCENE, currentChoice);
-
+        try
+        {
+            RemoteAdminController.Instance.SendMessage(RemoteAdminController.SendMessageType.SELECT_SCENE, currentChoice);
+        } catch (System.Exception e)
+        {
+            Debug.Log("Eccezione in sendMessage di RemoteAdminController: " + e);
+        }
         base.OnSelectConfirm();
     }
 

@@ -15,6 +15,7 @@ using System.Linq;
 [CustomEditor(typeof(CarAutoPath))]
 public class CarAutoPathEditor : Editor {
 
+
     bool vis = false;
     int min = 0;
 
@@ -50,7 +51,7 @@ public class CarAutoPathEditor : Editor {
             RaycastHit hit;
             Physics.Raycast(currentSpot + Vector3.up * 5, -Vector3.up, out hit, 100f, ~(1 << LayerMask.NameToLayer("Traffic")));
 
-            Vector3 hTarget = new Vector3(currentSpot.x, hit.point.y + 0.2f, currentSpot.z);
+            Vector3 hTarget = new Vector3(currentSpot.x, hit.point.y, currentSpot.z);
 
             vecs.Add(hTarget);
             Handles.Label(hTarget, "" + i++);

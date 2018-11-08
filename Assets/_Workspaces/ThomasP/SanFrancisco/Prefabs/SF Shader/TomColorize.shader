@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 // Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 
@@ -76,7 +78,7 @@ Shader "Shader Forge/TomColorize" {
                 o.binormalDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
                 float4 objPos = mul ( unity_ObjectToWorld, float4(0,0,0,1) );
                 o.posWorld = mul(unity_ObjectToWorld, v.vertex);
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+                o.pos = UnityObjectToClipPos(v.vertex);
                 #ifndef LIGHTMAP_OFF
                     o.uvLM = v.uv1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
                 #endif
@@ -187,7 +189,7 @@ Shader "Shader Forge/TomColorize" {
                 o.binormalDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
                 float4 objPos = mul ( unity_ObjectToWorld, float4(0,0,0,1) );
                 o.posWorld = mul(unity_ObjectToWorld, v.vertex);
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+                o.pos = UnityObjectToClipPos(v.vertex);
                 TRANSFER_VERTEX_TO_FRAGMENT(o)
                 return o;
             }

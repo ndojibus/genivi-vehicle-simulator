@@ -182,9 +182,15 @@ public class TrackController : UnitySingleton<TrackController> {
     [HideInInspector]
     public float mapZPos = 0f;
 
+    //ANTONELLO
+    public bool visualizzaInfrazioni = false;
+
     public void AddInfraction(DrivingInfraction d)
     {
-
+        if (!visualizzaInfrazioni)
+        {
+            return;
+        }
         infractionsAlertTimer = Time.time;
         if(infractionsAlertSound != null)
             AudioController.Instance.PlayClip(infractionsAlertSound);
@@ -373,7 +379,7 @@ public class TrackController : UnitySingleton<TrackController> {
             {
                 data[i] = new LightmapData()
                 {
-                    lightmapLight = Resources.Load<Texture2D>("CarSelect_Lightmaps/LightmapFar-" + i)
+                    lightmapColor = Resources.Load<Texture2D>("CarSelect_Lightmaps/LightmapFar-" + i)
                 };
             }
             LightmapSettings.lightmapsMode = LightmapsMode.NonDirectional;
@@ -425,14 +431,14 @@ public class TrackController : UnitySingleton<TrackController> {
         configurator.LoadSettings();
 
         //Add infraction recorder
-        car.AddComponent<InfractionRecorder>();
+        //car.AddComponent<InfractionRecorder>(); //DARIO
 
         //init new admin screen
         var newAdmin = GameObject.Find("AdminScreen");
         newAdmin.GetComponent<NewAdminScreen>().Init();
 
         //add CANDataCollector
-        car.AddComponent<CANDataCollector>();
+        //car.AddComponent<CANDataCollector>(); //DARIO
 
         //init SlipMeter
         //slipMeter = Resources.Load<GameObject>("SlipMeter");
@@ -1124,6 +1130,99 @@ public class TrackController : UnitySingleton<TrackController> {
         }
     }
 
+    //ANTONELLO
+    public void LanciaOstacolo(int id)
+    {
+        //Vector3[] spot = GetObstacleSpawnPositionTraffic();
+        Vector3[] spot = new Vector3[2];
+
+        if (id == 10)
+        {
+            //spot = GetNextIntersectionTaffic();
+            spot[0] = new Vector3(1402f, 11.1f, 755.7f);
+            spot[1] = new Vector3(1401.6f, 11.1f, 747.62f);
+        }
+        if (id == 11 ) //&& spot[0] == Vector3.zero)
+        {
+            //non si è settato spot, lo setto io
+            spot[0] = new Vector3(1418f, 12.1f, 808.5f);
+            spot[1] = new Vector3(1412f, 12.1f, 808.5f);
+        }
+        if (id == 12)
+        {
+            spot[0] = new Vector3(1281.8f, 8f, 961.1f);
+            spot[1] = new Vector3(1281.8f, 8f, 955.1f);
+        }
+        if (id == 13) //&& spot[0] == Vector3.zero)
+        {
+            //non si è settato spot, lo setto io
+            spot[0] = new Vector3(1418f, 12.1f, 808.5f);
+            spot[1] = new Vector3(1412f, 12.1f, 808.5f);
+        }
+
+
+        if (spot[0] != Vector3.zero)
+        {
+            GameObject obs = null;
+            if (id == 10)
+            {
+                obs = GameObject.Instantiate(obstacles[0], Vector3.zero, Quaternion.identity) as GameObject;
+            }
+            if (id == 12)
+            {
+                obs = GameObject.Instantiate(obstacles[0], Vector3.zero, Quaternion.identity) as GameObject;
+            }
+            if (id == 11)
+            {
+                obs = GameObject.Instantiate(obstacles[2], Vector3.zero, Quaternion.identity) as GameObject;               
+            }
+            if (id == 13)
+            {
+                obs = GameObject.Instantiate(obstacles[1], Vector3.zero, Quaternion.identity) as GameObject;
+            }
+            BaseObstacle ob = obs.GetComponent<BaseObstacle>();
+            obs.transform.position = spot[0];
+            obs.transform.LookAt(spot[1]);
+            obs.tag = "Obstacle";
+            if (id == 10)
+            {
+                obs.tag = "Stop";
+                if (obs.transform.Find("Cube") != null)
+                {
+                    obs.transform.Find("Cube").GetComponent<Renderer>().enabled = true;
+                }
+                obs.GetComponent<AnimalObstacle>().triggerDistance = 40f;
+            }
+
+            
+            if (id == 10)
+            {
+                obs.transform.position = obs.transform.position - obs.transform.forward * 12f;
+                return;
+            }
+            if (id == 11)
+            {
+                obs.transform.position = new Vector3(1418f, 12.1f, 823.36f) - obs.transform.forward * 7f;
+                return;
+            }
+            if (id == 12)
+            {
+                obs.transform.position = obs.transform.position - obs.transform.forward * 2f;
+                return;
+            }
+            if (id == 13)
+            {
+                // obs.transform.position = new Vector3(1418f, 12.1f, 823.36f) - obs.transform.forward * 22.5f;
+                obs.transform.position = new Vector3(1418f, 12.1f, 823.36f) - obs.transform.forward * 5f;
+                return;
+            }
+
+        }
+
+
+    }
+
+
     public void TriggerObstacle1()
     {
         TriggerObstacle(0);            
@@ -1210,7 +1309,8 @@ public class TrackController : UnitySingleton<TrackController> {
         }
     }
 
-    private TrafEntry GetCurrentTrafEntry()
+    //ANTONELLO inizialmente era private
+    public TrafEntry GetCurrentTrafEntry()
     {
         Vector3 carPos = car.transform.position;
 
@@ -1421,14 +1521,21 @@ public class TrackController : UnitySingleton<TrackController> {
 
     public void AutoPath()
     {
+        Debug.Log("sono in AutoPath()");
         if (hasTraffic)
+        {
+            //san francisco
+            Debug.Log("Autopath not available in SF");
             return;
+        }
+            
 
         if (GameObject.Find("AutoPath") == null)
         {
             Debug.Log("No auto path found");
             return;
         }
+        Debug.Log("auto path found");
 
         if (isInAutoPath)
         {

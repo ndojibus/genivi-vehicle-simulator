@@ -59,7 +59,13 @@ public class TrafPCH: MonoBehaviour
     public float currentSpeed;
     public float currentTurn;
 
+    //ANTONELLO
+    float velocitaPrecedente = 0;
+    public float accelerazione = 0;
+    public bool luceStop = false;
+
     RaycastHit hitInfo;
+
 
     void Start()
     {
@@ -103,6 +109,7 @@ public class TrafPCH: MonoBehaviour
 
 
         targetSpeed = maxSpeed;
+
 
     }
 
@@ -172,6 +179,9 @@ public class TrafPCH: MonoBehaviour
 
         */
 
+        accelerazione = (currentSpeed - velocitaPrecedente) / Time.deltaTime;
+        velocitaPrecedente = currentSpeed;
+
 
 
 
@@ -195,7 +205,7 @@ public class TrafPCH: MonoBehaviour
 
 
         float speedDifference = targetSpeed - GetComponent<Rigidbody>().velocity.magnitude;
-
+        //float speedDifference = targetSpeed - currentSpeed;
 
 
 
@@ -229,6 +239,8 @@ public class TrafPCH: MonoBehaviour
             return false;
         }
     }
+
+    private float turnPrecedente = 0;
 
     void MoveCar()
     {
@@ -270,7 +282,7 @@ public class TrafPCH: MonoBehaviour
 
         //transform.Rotate(0f, currentTurn * Time.deltaTime, 0f);
         RaycastHit hit;
-        Physics.Raycast(transform.position + Vector3.up * 5, -transform.up, out hit, 100f, ~(1 << LayerMask.NameToLayer("Traffic")));
+        Physics.Raycast(transform.position + Vector3.up * 5, -transform.up, out hit, 100f, ~(1 << LayerMask.NameToLayer("Traffic") | 1 << LayerMask.NameToLayer("Graphics"))); //DARIO
 
         Vector3 hTarget = new Vector3(currentSpot.x, hit.point.y, currentSpot.z);
 
@@ -287,9 +299,15 @@ public class TrafPCH: MonoBehaviour
         tangent.y = 0f;
         tangent = tangent.normalized;
 
-        GetComponent<Rigidbody>().MoveRotation(Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.LookRotation(tangent));
+        //GetComponent<Rigidbody>().MoveRotation(Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.LookRotation(tangent));
         GetComponent<Rigidbody>().MovePosition(hTarget);
-        //transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime);
+        // transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime);
+        //transform.Translate(hTarget * Time.deltaTime);
+        //transform.LookAt(nextWaypoint);
+        currentTurn = Vector3.SignedAngle(transform.forward, currentWaypoint - transform.position, Vector3.up);
+        currentTurn = Mathf.Clamp(Mathf.Lerp(turnPrecedente, currentTurn, steerSpeed * Time.fixedDeltaTime), -45f, 45f);
+        GetComponent<Rigidbody>().MoveRotation(Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.Euler(0f, transform.eulerAngles.y + currentTurn * Time.fixedDeltaTime * 2f, 0f));
+        turnPrecedente = currentTurn;
     }
 
 }

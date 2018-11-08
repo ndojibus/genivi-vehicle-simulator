@@ -23,9 +23,10 @@ public abstract class BaseObstacle : MonoBehaviour
     public abstract void OnTrigger();
     public virtual void CleanUp()
     {
-        Destroy(gameObject);
+        
     }
 
+    
     protected virtual void Update()
     {
         float dist = Vector3.Distance(transform.position, TrackController.Instance.car.transform.position);

@@ -42,6 +42,8 @@ public class SelectAdminUI : MonoBehaviour {
     public SelectChoiceUI[] cars;
     public SelectChoiceUI[] environments;
 
+    public SelectChoiceUI[] HUDType; //DARIO
+
 
     public CarSelectController carSelect;
     public EnvironmentSelectController environmentSelect;
@@ -70,6 +72,8 @@ public class SelectAdminUI : MonoBehaviour {
     public GUIStyle infractionsTitleStyle;
 
     private InfractionReviewUI reviewUI;
+
+    public static event System.Action<int> OnHUDType; //DARIO
 
     void Awake () {
 
@@ -263,7 +267,7 @@ public class SelectAdminUI : MonoBehaviour {
         GUI.DrawTexture(logoRect, logos);
 
         GUI.Label(titleLabel, "VEHICLE & SCENE SELECT", isAdditional || isInfractions ? textOff : textOn);
-        if (Event.current.type == EventType.mouseDown && titleLabel.Contains(Event.current.mousePosition))
+        if (Event.current.type == EventType.MouseDown && titleLabel.Contains(Event.current.mousePosition))
         {
             hitAdditional = false;
             hitInfractions = false;
@@ -271,14 +275,14 @@ public class SelectAdminUI : MonoBehaviour {
 
 
         GUI.Label(additionalControlsLabel, "ADDITIONAL CONTROLS", isAdditional ? textOn : textOff);
-        if (Event.current.type == EventType.mouseDown && additionalControlsLabel.Contains(Event.current.mousePosition))
+        if (Event.current.type == EventType.MouseDown && additionalControlsLabel.Contains(Event.current.mousePosition))
         {
             hitAdditional = true;
             hitInfractions = false;
         }
 
         GUI.Label(infractionsLabel, "INFRACTIONS", isInfractions ? textOn : textOff);
-        if (Event.current.type == EventType.mouseDown && infractionsLabel.Contains(Event.current.mousePosition))
+        if (Event.current.type == EventType.MouseDown && infractionsLabel.Contains(Event.current.mousePosition))
         {
             hitAdditional = false;
             hitInfractions = true;
@@ -373,6 +377,26 @@ public class SelectAdminUI : MonoBehaviour {
                 {
                     GUI.DrawTexture(env.checkPosition, checkTex);
                 }
+            }
+
+            foreach (var h in HUDType) //DARIO
+            {
+                GUI.DrawTexture(h.position, h.texture);
+                GUI.Label(h.textPosition, h.name, thumbText);
+                if (h.position.Contains(Event.current.mousePosition))
+                {
+                    GUI.DrawTexture(h.position, rolloverTex, ScaleMode.StretchToFill, true);
+                    if (Event.current.type == EventType.MouseDown)
+                    {
+                        if (OnHUDType != null)  //DARIO
+                            OnHUDType(h.selectIndex);
+                    }
+                }
+
+                //if (environmentSelect.enabled == true && !environmentSelect.CanSelect())
+                //{
+                //    GUI.DrawTexture(env.checkPosition, checkTex);
+                //}
             }
 
             GUI.EndGroup();

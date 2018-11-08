@@ -51,6 +51,7 @@ public class DriverCamera : MonoBehaviour {
 
         SetNearClip(AdminSettings.Instance.camNearClip);
 
+
     }
 
     public void SetCameraType(AdminScreen.DisplayType newType, float fov)
@@ -163,10 +164,11 @@ public class DriverCamera : MonoBehaviour {
     {
         fixTo.enabled = true;
         smoothFollow.enabled = false;
-        LayerMask mask = center.GetComponent<Camera>().cullingMask & ~(1 << LayerMask.NameToLayer(playerCarLayer));
+        //DARIO
+        /*LayerMask mask = center.GetComponent<Camera>().cullingMask & ~(1 << LayerMask.NameToLayer(playerCarLayer));
         center.GetComponent<Camera>().cullingMask = mask;
         left.GetComponent<Camera>().cullingMask = mask;
-        right.GetComponent<Camera>().cullingMask = mask;
+        right.GetComponent<Camera>().cullingMask = mask;*/
     }
 
     public void ViewThirdPerson()

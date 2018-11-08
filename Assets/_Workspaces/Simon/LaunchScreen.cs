@@ -25,15 +25,15 @@ public class LaunchScreen : MonoBehaviour {
     private float jlrAlpha = 0f;
     
     public IEnumerator StartSequence(System.Action OnFinished) {
-        yield return StartCoroutine(Fade (f => mainTextAlpha = f, mainTextAlpha, 1f, fadeTime));
+        yield return StartCoroutine(Fade (f => mainTextAlpha = f, mainTextAlpha, 1f, fadeTime));  //coroutine is started before yield
         yield return new WaitForSeconds (showTime);
         yield return StartCoroutine (Fade (f => presentedByAlpha = f, presentedByAlpha, 1f, fadeTime));
         yield return new WaitForSeconds (showTime/2f);
 
-        yield return StartCoroutine (Fade (f =>  jlrAlpha = f, jlrAlpha, 1f, fadeTime));
+        yield return StartCoroutine (Fade (f =>  jlrAlpha = f, jlrAlpha, 1f, fadeTime));//appear
         yield return new WaitForSeconds (showTime);
 
-        StartCoroutine (Fade (f => jlrAlpha = f, jlrAlpha, 0f, fadeTime));
+        StartCoroutine (Fade (f => jlrAlpha = f, jlrAlpha, 0f, fadeTime));//disappear
         yield return StartCoroutine (Fade (f => presentedByAlpha = f, presentedByAlpha, 0f, fadeTime));
         yield return StartCoroutine (Fade (f => createdByAlpha = f, createdByAlpha, 1f, fadeTime));
         yield return new WaitForSeconds (showTime/2f);

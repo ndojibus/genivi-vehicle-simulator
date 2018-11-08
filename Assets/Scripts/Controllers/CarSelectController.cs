@@ -393,10 +393,11 @@ public class CarSelectController : BaseSelectController
                     camMove.updateRotation = true;
                 }));
 
-                StartCoroutine(Functional.WatchFor(() => Vector3.Distance(camMove.transform.position, camTarget.position) < 1.5f, () =>
+                //DARIO
+                /*StartCoroutine(Functional.WatchFor(() => Vector3.Distance(camMove.transform.position, camTarget.position) < 1.5f, () =>
                 {
                     camMove.GetComponent<DriverCamera>().SetCulingMask(~(1 << LayerMask.NameToLayer("PlayerCar")));
-                }));
+                }));*/
             }));
 
 

@@ -108,6 +108,7 @@ public class TrafSpawnerPCH : MonoBehaviour, ITrafficSpawner
                 SpawnHeaps();
 
             spawned = !spawned;
+
         }
 
     }
